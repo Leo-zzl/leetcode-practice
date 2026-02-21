@@ -24,9 +24,17 @@ LeetCode 算法练习记录
 
 | 难度 | 已完成 | 目标 |
 |------|--------|------|
-| Easy | 0 | 100 |
+| Easy | 1 | 100 |
 | Medium | 0 | 150 |
 | Hard | 0 | 50 |
+
+## ✅ 已完成题目
+
+### Easy
+- [1. 两数之和 (Two Sum)](https://leetcode.cn/problems/two-sum/)
+  - 文件: `easy/py1/main.py`
+  - 测试: `easy/py1/test_main.py`
+  - 方法: 哈希表 O(n)
 
 ## 📝 刷题模板
 
