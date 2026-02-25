@@ -50,8 +50,35 @@ pub struct Solution;
 
 impl Solution {
     pub fn sum_root_to_leaf(root: Option<Rc<RefCell<TreeNode>>>) -> i32 {
-        // TODO: 请在这里实现你的解法
-        0
+        Self::dfs(root, 0)
+    }
+
+    /// DFS 遍历二叉树
+    /// 
+    /// # 参数
+    /// - `node`: 当前节点
+    /// - `current`: 从根节点到父节点路径表示的二进制数值
+    /// 
+    /// # 原理
+    /// 每深入一层，当前值左移 1 位（乘以 2），然后加上当前节点值
+    /// 即: val = (current << 1) | node.val
+    fn dfs(node: Option<Rc<RefCell<TreeNode>>>, current: i32) -> i32 {
+        match node {
+            None => 0,
+            Some(n) => {
+                let n = n.borrow();
+                // 计算当前路径值: 父节点值 * 2 + 当前节点值
+                let val = (current << 1) | n.val;
+
+                // 如果是叶子节点，返回当前路径值
+                if n.left.is_none() && n.right.is_none() {
+                    return val;
+                }
+
+                // 非叶子节点，继续 DFS 左右子树，累加结果
+                Self::dfs(n.left.clone(), val) + Self::dfs(n.right.clone(), val)
+            }
+        }
     }
 }
 
@@ -151,8 +178,23 @@ mod tests {
     fn test_right_skewed_tree() {
         // 右斜树: 1 -> 1 -> 0
         // 路径: 110 = 6
-        let root = build_tree(vec![Some(1), None, Some(1), None, None, Some(0)]);
-        assert_eq!(Solution::sum_root_to_leaf(root), 6);
+        // 层序: [1, None, 1, None, None, 0]
+        // index 0: 1 (root)
+        // index 1: None (left of 1)
+        // index 2: 1   (right of 1) 
+        // index 3: None (left of right-1, skipped because parent is None)
+        // index 4: None (right of right-1)
+        // index 5: 0   (left of right-1's right None -> wait, this doesn't work)
+        // 
+        // 正确的构建方式：手动构建
+        let root = Rc::new(RefCell::new(TreeNode::new(1)));
+        let right1 = Rc::new(RefCell::new(TreeNode::new(1)));
+        let right2 = Rc::new(RefCell::new(TreeNode::new(0)));
+        
+        root.borrow_mut().right = Some(right1.clone());
+        right1.borrow_mut().right = Some(right2);
+        
+        assert_eq!(Solution::sum_root_to_leaf(Some(root)), 6);
     }
 
     #[test]

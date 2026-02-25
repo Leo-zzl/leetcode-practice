@@ -1,137 +1,97 @@
 # LeetCode 1022 - 从根到叶的二进制数之和
 
-## 题目信息
+**题号**: 1022  
+**难度**: Easy  
+**链接**: https://leetcode.cn/problems/sum-of-root-to-leaf-binary-numbers/
 
-| 项目 | 内容 |
-|------|------|
-| 题号 | 1022 |
-| 标题 | Sum of Root To Leaf Binary Numbers |
-| 中文 | 从根到叶的二进制数之和 |
-| 难度 | Easy |
-| 链接 | https://leetcode.cn/problems/sum-of-root-to-leaf-binary-numbers/ |
+---
 
-## 题目描述
+## 题目大意
 
-给出一棵二叉树，其上每个结点的值都是 `0` 或 `1` 。
+每个节点是 0 或 1 的二叉树，从根到叶子的路径组成一个二进制数（比如 `1->0->1` 就是 `101` = 5）。求所有根到叶子路径的数字之和。
 
-每一条从根到叶的路径都代表一个从最高有效位开始的二进制数。
-
-- 例如，如果路径为 `0 -> 1 -> 1 -> 0 -> 1`，那么它表示二进制数 `01101`，也就是 `13`。
-
-对树上的每一片叶子，我们都要找出从根到该叶子的路径所表示的数字。
-
-返回这些数字之和。题目数据保证答案是一个 **32 位** 整数。
-
-## 示例
-
-### 示例 1
-
+**示例 1**：
 ```
-输入：root = [1,0,1,0,1,0,1]
-      1
-     / \
-    0   1
+    1
    / \
   0   1
-输出：22
-解释：(100) + (101) + (110) + (111) = 4 + 5 + 6 + 7 = 22
+ / \
+0   1
 ```
+路径: `100`(4) + `101`(5) + `110`(6) + `111`(7) = **22**
 
-### 示例 2
-
+**示例 2**：
 ```
-输入：root = [0]
-输出：0
+  0
 ```
+输出: **0**
 
-## 提示
+---
 
-- 树中的节点数在 `[1, 1000]` 范围内
-- `Node.val` 仅为 `0` 或 `1`
+## 我的解法
 
-## 解题思路
+直接用 DFS，遍历每个节点时计算当前路径值。
 
-### 核心思想
+**关键观察**：
+- 每往下一层，之前的路径值要左移一位（×2），再加上当前节点的值
+- 比如路径 `1 -> 0 -> 1`：
+  - 根节点 1: `0 * 2 + 1 = 1`
+  - 节点 0:   `1 * 2 + 0 = 2` (二进制 10)
+  - 节点 1:   `2 * 2 + 1 = 5` (二进制 101)
 
-使用 **DFS (深度优先搜索)** 遍历二叉树：
-
-1. 从根节点开始，维护当前路径表示的数值
-2. 到达叶子节点时，将当前数值加入总和
-3. 利用位运算优化：每深入一层，当前值左移 1 位再加上节点值
-
-### 位运算技巧
-
-```
-当前值 = (当前值 << 1) | 节点值
-
-例如：路径 1 -> 0 -> 1
-      1: (0 << 1) | 1 = 1
-      0: (1 << 1) | 0 = 2  (二进制 10)
-      1: (2 << 1) | 1 = 5  (二进制 101)
-```
-
-### 复杂度分析
-
-| 项目 | 复杂度 | 说明 |
-|------|--------|------|
-| 时间 | O(n) | 遍历每个节点一次 |
-| 空间 | O(h) | 递归栈深度，h 为树高度 |
-
-## 文件结构
-
-```
-lc1022/
-├── Cargo.toml      # Rust 项目配置
-├── src/
-│   └── lib.rs      # Solution 实现和测试
-└── README.md       # 本文件
-```
-
-## 运行测试
-
-```bash
-# 运行所有测试
-cargo test
-
-# 运行特定测试
-cargo test test_example_1
-
-# 显示测试输出
-cargo test -- --nocapture
-```
-
-## 核心代码模板
-
+**代码核心**（Rust）：
 ```rust
-use std::rc::Rc;
-use std::cell::RefCell;
-
-impl Solution {
-    pub fn sum_root_to_leaf(root: Option<Rc<RefCell<TreeNode>>>) -> i32 {
-        Self::dfs(root, 0)
-    }
-    
-    fn dfs(node: Option<Rc<RefCell<TreeNode>>>, current: i32) -> i32 {
-        match node {
-            None => 0,
-            Some(n) => {
-                let n = n.borrow();
-                let val = (current << 1) | n.val;
-                
-                // 如果是叶子节点
-                if n.left.is_none() && n.right.is_none() {
-                    return val;
-                }
-                
-                // 继续遍历左右子树
-                Self::dfs(n.left.clone(), val) + 
-                Self::dfs(n.right.clone(), val)
+fn dfs(node: Option<Rc<RefCell<TreeNode>>>, current: i32) -> i32 {
+    match node {
+        None => 0,
+        Some(n) => {
+            let n = n.borrow();
+            let val = (current << 1) | n.val;  // 当前值 = 父值*2 + 当前节点值
+            
+            if n.left.is_none() && n.right.is_none() {
+                return val;  // 叶子节点，返回这条路径的值
             }
+            
+            dfs(n.left.clone(), val) + dfs(n.right.clone(), val)
         }
     }
 }
 ```
 
+**复杂度**：
+- 时间 O(n) - 每个节点访问一次
+- 空间 O(h) - 递归栈深度，h 是树高
+
 ---
 
-Happy Coding! 🦀
+## 踩坑记录
+
+### 坑 1：递推公式想复杂了
+
+一开始想的公式是 `tmp = tmp * 2^depth + cur`，觉得要考虑深度。其实完全没必要，**每往下走一层就乘 2**，不需要管当前是第几层。
+
+正确公式：`val = (val << 1) | cur` 或 `val = val * 2 + cur`
+
+### 坑 2：测试用例构建翻车
+
+右斜树的测试用例，用 `build_tree(vec![Some(1), None, Some(1), None, None, Some(0)])` 构建，结果树的结构不对。因为 `build_tree` 是按层序遍历构建的，空节点不入队，数组里跳过的位置会乱掉。
+
+**解决**：这种特殊结构的手动构建更靠谱：
+```rust
+let root = Rc::new(RefCell::new(TreeNode::new(1)));
+let right1 = Rc::new(RefCell::new(TreeNode::new(1)));
+let right2 = Rc::new(RefCell::new(TreeNode::new(0)));
+
+root.borrow_mut().right = Some(right1.clone());
+right1.borrow_mut().right = Some(right2);
+```
+
+---
+
+## 运行
+
+```bash
+cargo test
+```
+
+全部 13 个测试通过 ✅
