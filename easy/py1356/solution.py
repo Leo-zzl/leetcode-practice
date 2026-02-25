@@ -20,6 +20,22 @@ from typing import List
 
 
 class Solution:
+    def count_bits0(self, n: int) -> int:
+        count = 0
+        while n:
+            n &= n - 1
+            count += 1
+        return count
+    
+    # 查表法：预计算 0-255 每个数的1的个数
+    # 因为 n <= 10000 < 2^14，最多只需要查2次表
+    _BIT_COUNT = [bin(i).count('1') for i in range(256)]
+    
+    def count_bits1(self, n: int) -> int:
+        """查表法计算二进制1的个数（针对 n <= 10000 优化）"""
+        return (self._BIT_COUNT[n & 0xFF] +           # 低8位
+                self._BIT_COUNT[(n >> 8) & 0xFF])     # 高8位（最多到第14位）
+    
     def sortByBits(self, arr: List[int]) -> List[int]:
         """
         按照二进制中 1 的数目升序排序，1 的数目相同则按数值大小排序
@@ -30,8 +46,7 @@ class Solution:
         Returns:
             排序后的数组
         """
-        # TODO: 请在这里实现你的解法
-        pass
+        return sorted(arr, key = lambda x: (self.count_bits1(x), x))
 
 
 def main():
