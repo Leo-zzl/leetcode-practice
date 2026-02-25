@@ -24,7 +24,7 @@ LeetCode 算法练习记录
 
 | 难度 | 已完成 | 目标 |
 |------|--------|------|
-| Easy | 1 | 100 |
+| Easy | 2 | 100 |
 | Medium | 0 | 150 |
 | Hard | 0 | 50 |
 
@@ -35,6 +35,12 @@ LeetCode 算法练习记录
   - 文件: `easy/py1/main.py`
   - 测试: `easy/py1/test_main.py`
   - 方法: 哈希表 O(n)
+
+- [1356. 根据数字二进制下 1 的数目排序](https://leetcode.cn/problems/sort-integers-by-the-number-of-1-bits/)
+  - 文件: `easy/py1356/solution.py`
+  - 测试: `easy/py1356/test_solution.py`
+  - 方法: 查表法 (Lookup Table) O(n log n)
+  - 优化: 针对 n ≤ 10000，仅需 2 次查表
 
 ## 📝 刷题模板
 
