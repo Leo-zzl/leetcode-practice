@@ -1,0 +1,10 @@
+[package]
+name = "lc1022"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+
+[lib]
+name = "lc1022"
+path = "src/lib.rs"
